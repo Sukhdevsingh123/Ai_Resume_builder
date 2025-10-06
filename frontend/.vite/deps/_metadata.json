@@ -1,0 +1,64 @@
+{
+  "hash": "54c880b6",
+  "configHash": "a994fb0d",
+  "lockfileHash": "cdb80ec8",
+  "browserHash": "7117fa98",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "6ef0f342",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "b6545860",
+      "needsInterop": true
+    },
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "b5d65bd7",
+      "needsInterop": false
+    },
+    "react-icons/fa": {
+      "src": "../../node_modules/react-icons/fa/index.mjs",
+      "file": "react-icons_fa.js",
+      "fileHash": "aa154703",
+      "needsInterop": false
+    },
+    "html2canvas-pro": {
+      "src": "../../node_modules/html2canvas-pro/dist/html2canvas-pro.esm.js",
+      "file": "html2canvas-pro.js",
+      "fileHash": "bf191e93",
+      "needsInterop": false
+    },
+    "jspdf": {
+      "src": "../../node_modules/jspdf/dist/jspdf.es.min.js",
+      "file": "jspdf.js",
+      "fileHash": "a4813e16",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "index.es-ISIPND53": {
+      "file": "index__es-ISIPND53.js"
+    },
+    "chunk-4BPZ7PBZ": {
+      "file": "chunk-4BPZ7PBZ.js"
+    },
+    "chunk-SITVF2AJ": {
+      "file": "chunk-SITVF2AJ.js"
+    },
+    "html2canvas.esm-BKLXZZBT": {
+      "file": "html2canvas__esm-BKLXZZBT.js"
+    },
+    "purify.es-JY3CPTI7": {
+      "file": "purify__es-JY3CPTI7.js"
+    },
+    "chunk-G3PMV62Z": {
+      "file": "chunk-G3PMV62Z.js"
+    }
+  }
+}
