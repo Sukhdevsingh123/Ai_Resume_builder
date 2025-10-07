@@ -25,12 +25,12 @@ const generateResume = async (req, res) => {
 
         **CRITICAL REQUIREMENTS - MUST FOLLOW EXACTLY:**
 
-        1. **JOB DESCRIPTION MATCHING:**
-           - Analyze the job description CAREFULLY and identify ALL required technologies, frameworks, and skills
-           - Replace or modify ALL existing content to match the job requirements
-           - Use EXACT terminology from the job description
-           - Ensure EVERY aspect of the resume aligns with the job requirements
-           - **IMPORTANT: Keep existing company names UNCHANGED**
+        1. **JOB DESCRIPTION ANALYSIS - FIRST PRIORITY:**
+           - CAREFULLY analyze the provided job description to understand the specific requirements
+           - Extract ALL required technologies, programming languages, frameworks, and tools mentioned
+           - Identify the industry, role type, experience level, and specific responsibilities
+           - **DO NOT assume any technology stack - use ONLY what's mentioned in the job description**
+           - Use these EXACT requirements to tailor the entire resume
 
         2. **COMPANY NAME PRESERVATION:**
            - **DO NOT change company names based on job description**
@@ -60,9 +60,9 @@ const generateResume = async (req, res) => {
 
         6. **CONTENT ADAPTATION - REPLACE WITH JOB-SPECIFIC CONTENT:**
            - **COMPLETELY REWRITE** experience bullet points to match job responsibilities
-           - Use the EXACT technologies mentioned in the job description
-           - Replace any mismatched technologies (e.g., if job requires Python, use Python/Django/Flask)
-           - Ensure ALL bullet points reflect the job's key responsibilities
+           - Use the EXACT technologies and terminology mentioned in the job description
+           - Replace any mismatched technologies with those specifically required in the job
+           - Ensure ALL bullet points reflect the job's key responsibilities and requirements
            - Make the experience directly relevant to the job requirements
            - **KEEP COMPANY NAMES UNCHANGED**
 
@@ -86,10 +86,10 @@ const generateResume = async (req, res) => {
            - Order skills by relevance to the job description
 
         **SPECIFIC JOB ANALYSIS:**
-        - Job requires: Python development, Django/Flask/FastAPI frameworks, REST API design
-        - Job requires: Object-oriented programming, database integration (PostgreSQL, MySQL, MongoDB)
-        - Job requires: Git, Docker, CI/CD tools, cloud platforms (AWS/Azure/GCP)
-        - **CRITICAL: Adapt ALL content to Python development while keeping company names unchanged**
+        - **ANALYZE THE JOB DESCRIPTION ABOVE** to identify required technologies, frameworks, and skills
+        - Extract key requirements, programming languages, tools, and frameworks mentioned
+        - Identify the role type, industry, and experience level required
+        - **CRITICAL: Adapt ALL content to match the ACTUAL job description requirements**
 
         **Job Description:**
         \`\`\`
@@ -105,11 +105,10 @@ const generateResume = async (req, res) => {
         - Return ONLY valid JSON with structure: { "experience": [...], "projects": [...], "skills": [...] }
         - **COMPLETELY ADAPT ALL CONTENT** to match the job description exactly
         - **KEEP ALL COMPANY NAMES UNCHANGED** (Techsteck Solutions must remain as current company)
-        - Experience periods MUST reflect required experience level (2+ years minimum for this job)
+        - Experience periods MUST reflect required experience level from the job description
         - **Experience dates MUST be in strict chronological order with NO overlaps**
         - **LIST EXPERIENCE IN REVERSE CHRONOLOGICAL ORDER (most recent first)**
-        - **Current job (with "Present") comes FIRST, then previous jobs**
-        - **REPLACE technologies to match job requirements (Python instead of other languages)**
+        - **REPLACE technologies to match the ACTUAL job requirements**
         - Minimum 3-4 projects with detailed 40-50 word descriptions using job technologies
         - Skills must match job requirements exactly
         - Use current year 2024 as reference for date calculations

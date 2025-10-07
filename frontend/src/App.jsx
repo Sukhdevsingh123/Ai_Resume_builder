@@ -8,6 +8,7 @@ import Toast from './components/Toast';
 
 // Set the base URL for all axios requests
 axios.defaults.baseURL = 'https://ai-resume-builder-2-w0b4.onrender.com';
+// axios.defaults.baseURL="http://localhost:5001";
 
 export default function App() {
   const [employees, setEmployees] = useState([]);
