@@ -1,6 +1,6 @@
 
-import { useRef } from 'react';
-import { FaPhoneAlt, FaTelegramPlane } from 'react-icons/fa';
+import { useRef, useEffect } from 'react';
+import { FaPhoneAlt, FaTelegramPlane, FaEdit, FaShareAlt } from 'react-icons/fa';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 
@@ -16,6 +16,344 @@ const ResumePreview = ({ resumeData }) => {
 
   const { name, phone, telegram, experience, projects, skills } = resumeData;
   const resumeRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdown = document.getElementById('share-dropdown');
+      const shareButton = event.target.closest('button');
+
+      if (dropdown && !dropdown.contains(event.target) && !shareButton) {
+        dropdown.classList.add('hidden');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const generateResumeText = () => {
+    let text = `${name}\n`;
+    text += `Phone: ${phone} | Telegram: ${telegram}\n\n`;
+
+    text += `EXPERIENCE\n`;
+    text += `═`.repeat(50) + `\n`;
+    experience?.forEach(exp => {
+      text += `${exp.company}\n`;
+      text += `${exp.role}\n`;
+      text += `${exp.period}\n`;
+      exp.points.forEach(point => {
+        text += `• ${point}\n`;
+      });
+      text += `\n`;
+    });
+
+    text += `PROJECTS\n`;
+    text += `═`.repeat(50) + `\n`;
+    projects?.forEach(proj => {
+      text += `${proj.name}\n`;
+      text += `${proj.description}\n\n`;
+    });
+
+    text += `SKILLS\n`;
+    text += `═`.repeat(50) + `\n`;
+    text += skills?.join(' • ') + `\n`;
+
+    return text;
+  };
+  const generateFormattedHTML = () => {
+    const resumeHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>${name} - Resume</title>
+        <style>
+          body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+          .name {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #000;
+          }
+          .contact {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+          }
+          .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .section {
+            margin-bottom: 30px;
+          }
+          .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 2px solid #333;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+          }
+          .experience-item {
+            margin-bottom: 25px;
+          }
+          .company {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+          }
+          .role {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+          }
+          .period {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+          }
+          .points {
+            list-style: none;
+            padding-left: 0;
+          }
+          .point {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+            text-align: justify;
+          }
+          .point::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #000;
+            font-weight: bold;
+          }
+          .project-item {
+            margin-bottom: 20px;
+          }
+          .project-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 8px;
+          }
+          .project-description {
+            text-align: justify;
+            line-height: 1.5;
+          }
+          .skills {
+            text-align: justify;
+            line-height: 1.6;
+          }
+          @media print {
+            body { margin: 0; padding: 15px; }
+            .header { margin-bottom: 20px; }
+            .section { margin-bottom: 20px; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="name">${name}</div>
+          <div class="contact">
+            <div class="contact-item">
+              <span>📞 ${phone}</span>
+            </div>
+            <div class="contact-item">
+              <span>📱 ${telegram}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Experience</div>
+          ${experience?.map(exp => `
+            <div class="experience-item">
+              <div class="company">${exp.company}</div>
+              <div class="role">${exp.role}</div>
+              <div class="period">${exp.period}</div>
+              <ul class="points">
+                ${exp.points.map(point => `<li class="point">${point}</li>`).join('')}
+              </ul>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="section">
+          <div class="section-title">Projects</div>
+          ${projects?.map(proj => `
+            <div class="project-item">
+              <div class="project-name">${proj.name}</div>
+              <div class="project-description">${proj.description}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="section">
+          <div class="section-title">Skills</div>
+          <div class="skills">${skills?.join(' • ')}</div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return resumeHTML;
+  };
+
+  const handleEditInGoogleDocs = () => {
+    // Generate formatted HTML content that Google Docs can understand
+    const resumeHTML = generateFormattedHTML();
+
+    // Prepare the HTML content for Google Docs
+    const formattedContent = resumeHTML
+      .replace(/<!DOCTYPE html>/g, '')
+      .replace(/<html>/g, '')
+      .replace(/<head>.*?<\/head>/gs, '')
+      .replace(/<\/html>/g, '')
+      .replace(/<\/body>/g, '');
+
+    // Copy the formatted content to clipboard
+    navigator.clipboard.writeText(formattedContent).then(() => {
+      // Open Google Docs
+      window.open('https://docs.google.com/document/create', '_blank');
+      setTimeout(() => {
+        alert('✅ Google Docs opened!\n\n📋 Resume content copied to clipboard\n\n📝 Please paste it (Ctrl+V) in the Google Doc');
+      }, 1000);
+    }).catch(() => {
+      alert('📋 Please copy this content and paste it in Google Docs:\n\n' + formattedContent.substring(0, 500) + '...');
+    });
+  };
+
+  const handleShare = async (platform) => {
+    const resumeText = generateResumeText();
+
+    switch (platform) {
+      case 'whatsapp':
+        // Direct WhatsApp sharing with formatted text
+        const whatsappText = `📄 *My Resume - ${name}*\n\n${resumeText}\n\n_Sent via Resume Builder_`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+        window.open(whatsappUrl, '_blank');
+        break;
+
+      case 'gmail':
+        // Direct Gmail integration with resume content in body
+        const subject = encodeURIComponent(`${name} - Resume`);
+        const body = encodeURIComponent(`Dear Hiring Manager,\n\nPlease find my resume below:\n\n${resumeText}\n\nBest regards,\n${name}\n${phone}\n${telegram}\n\n(This resume was generated using Resume Builder)`);
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
+        window.open(gmailUrl, '_blank');
+        break;
+
+      case 'drive':
+        // Enhanced Google Drive workflow - download PDF and open Drive with instructions
+        const pdfBlob = await generateAndGetPDF();
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        // Download PDF first
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = `${(name || 'resume').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_resume.pdf`;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Open Google Drive
+        const driveWindow = window.open('https://drive.google.com', '_blank');
+
+        // Enhanced instructions with timing
+        setTimeout(() => {
+          if (driveWindow && !driveWindow.closed) {
+            alert('✅ Resume PDF downloaded!\n\n☁️ Google Drive opened in another tab\n\n📤 Quick Upload Steps:\n1. Look for "New" button (left side)\n2. Click "New" → "File upload"\n3. Select the downloaded PDF file\n4. Upload complete! 🎉\n\n💡 File should be in your Downloads folder');
+          } else {
+            alert('✅ Resume PDF downloaded!\n\n☁️ Please visit: drive.google.com\n\n📤 Upload Steps:\n1. Click "New" → "File upload"\n2. Select the downloaded PDF\n3. Upload complete! 🎉\n\n💡 File should be in your Downloads folder');
+          }
+
+          // Clean up
+          setTimeout(() => {
+            URL.revokeObjectURL(pdfUrl);
+          }, 1000);
+        }, 1500);
+        break;
+    }
+
+    // Close dropdown
+    document.getElementById('share-dropdown').classList.add('hidden');
+  };
+
+  const generateAndGetPDF = () => {
+    return new Promise((resolve, reject) => {
+      const input = resumeRef.current;
+      if (!input) {
+        reject(new Error("Resume element not found"));
+        return;
+      }
+
+      const options = {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: true,
+        width: input.offsetWidth,
+        height: input.offsetHeight,
+      };
+
+      html2canvas(input, options)
+        .then((canvas) => {
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+          });
+
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          const imgWidth = canvas.width;
+          const imgHeight = canvas.height;
+          const imgAspectRatio = imgWidth / imgHeight;
+          const pageAspectRatio = pdfWidth / pdfHeight;
+
+          let finalWidth, finalHeight;
+          if (imgAspectRatio > pageAspectRatio) {
+            finalWidth = pdfWidth;
+            finalHeight = pdfWidth / imgAspectRatio;
+          } else {
+            finalHeight = pdfHeight;
+            finalWidth = pdfHeight * imgAspectRatio;
+          }
+
+          const xOffset = (pdfWidth - finalWidth) / 2;
+          const yOffset = (pdfHeight - finalHeight) / 2;
+
+          const imgData = canvas.toDataURL('image/png');
+          pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+
+          // Get PDF as blob
+          const pdfBlob = pdf.output('blob');
+          resolve(pdfBlob);
+        })
+        .catch(reject);
+    });
+  };
 
   const handleDownload = () => {
     const input = resumeRef.current;
@@ -148,7 +486,44 @@ const ResumePreview = ({ resumeData }) => {
 
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end mb-4 gap-3">
+        <button
+          onClick={handleEditInGoogleDocs}
+          className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2"
+        >
+          <FaEdit /> Edit in Docs
+        </button>
+
+        <div className="relative">
+          <button
+            onClick={() => document.getElementById('share-dropdown').classList.toggle('hidden')}
+            className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-300 flex items-center gap-2"
+          >
+            <FaShareAlt /> Share
+          </button>
+
+          <div id="share-dropdown" className="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <button
+              onClick={() => handleShare('whatsapp')}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+            >
+              📱 WhatsApp (Instant)
+            </button>
+            <button
+              onClick={() => handleShare('gmail')}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+            >
+              📧 Gmail (Instant)
+            </button>
+            <button
+              onClick={() => handleShare('drive')}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+            >
+              ☁️ Google Drive (Auto-Download)
+            </button>
+          </div>
+        </div>
+
         <button
           onClick={handleDownload}
           className="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300"
