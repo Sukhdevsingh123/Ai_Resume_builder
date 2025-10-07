@@ -479,92 +479,105 @@ const ResumePreview = ({ resumeData }) => {
   };
 
   const SectionTitle = ({ title }) => (
-    <h2 className="text-xl font-bold text-gray-900 border-b-2 border-gray-800 pb-2 mb-4 uppercase tracking-wider">
+    <h2 className="text-lg sm:text-xl font-bold text-gray-900 border-b-2 border-gray-800 pb-2 mb-4 uppercase tracking-wider">
       {title}
     </h2>
   );
 
   return (
     <>
-      <div className="flex justify-end mb-4 gap-3">
+      {/* Responsive button container */}
+      <div className="flex flex-col sm:flex-row justify-end mb-4 gap-3">
         <button
           onClick={handleEditInGoogleDocs}
-          className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center gap-2"
+          className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
         >
-          <FaEdit /> Edit in Docs
+          <FaEdit className="w-4 h-4" />
+          <span className="hidden sm:inline">Edit in Docs</span>
+          <span className="sm:hidden">Docs</span>
         </button>
 
         <div className="relative">
           <button
             onClick={() => document.getElementById('share-dropdown').classList.toggle('hidden')}
-            className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-300 flex items-center gap-2"
+            className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-300 flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
           >
-            <FaShareAlt /> Share
+            <FaShareAlt className="w-4 h-4" />
+            <span className="hidden sm:inline">Share</span>
+            <span className="sm:hidden">Share</span>
           </button>
 
           <div id="share-dropdown" className="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
             <button
               onClick={() => handleShare('whatsapp')}
-              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm"
             >
-              📱 WhatsApp (Instant)
+              <span className="text-lg">📱</span>
+              WhatsApp (Instant)
             </button>
             <button
               onClick={() => handleShare('gmail')}
-              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm"
             >
-              📧 Gmail (Instant)
+              <span className="text-lg">📧</span>
+              Gmail (Instant)
             </button>
             <button
               onClick={() => handleShare('drive')}
-              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-sm"
             >
-              ☁️ Google Drive (Auto-Download)
+              <span className="text-lg">☁️</span>
+              Google Drive (Auto-Download)
             </button>
           </div>
         </div>
 
         <button
           onClick={handleDownload}
-          className="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300"
+          className="bg-green-600 text-white font-bold py-2 px-4 sm:px-6 rounded-lg hover:bg-green-700 transition duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
         >
-          Download as PDF
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l4-4m-4 4l-4-4m8 2h3m-3 4h3m-6-8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="hidden sm:inline">Download as PDF</span>
+          <span className="sm:hidden">PDF</span>
         </button>
       </div>
 
-      <div className="bg-white p-8 max-w-4xl mx-auto print:shadow-none print:rounded-none" ref={resumeRef}>
+      {/* Responsive resume container */}
+      <div className="bg-white p-4 sm:p-6 lg:p-8 max-w-full mx-auto shadow-lg rounded-lg print:shadow-none print:rounded-none" ref={resumeRef}>
         {/* Header */}
         <div className="text-center border-b-2 border-gray-300 pb-4 mb-6">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3 leading-tight">{name}</h1>
-          <div className="flex justify-center items-center space-x-8 text-gray-600">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">{name}</h1>
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-8 text-gray-600">
             <div className="flex items-center space-x-2">
-              <FaPhoneAlt className="text-base" />
-              <span className="text-base font-medium">{phone}</span>
+              <FaPhoneAlt className="text-sm sm:text-base" />
+              <span className="text-sm sm:text-base font-medium">{phone}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <FaTelegramPlane className="text-base" />
-              <span className="text-base font-medium">{telegram}</span>
+              <FaTelegramPlane className="text-sm sm:text-base" />
+              <span className="text-sm sm:text-base font-medium">{telegram}</span>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Experience */}
           <div>
             <SectionTitle title="EXPERIENCE" />
             <div className="space-y-4">
               {experience?.map((exp, index) => (
                 <div key={index}>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-gray-900">{exp.company}</h3>
-                    <p className="text-sm font-semibold text-gray-700">{exp.period}</p>
+                  <div className="flex flex-col sm:flex-row sm:justify-between items-start mb-2">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1 sm:mb-0">{exp.company}</h3>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-700">{exp.period}</p>
                   </div>
-                  <p className="font-semibold text-base text-gray-800 mb-2">{exp.role}</p>
+                  <p className="font-semibold text-sm sm:text-base text-gray-800 mb-2">{exp.role}</p>
                   <ul className="space-y-1">
                     {exp.points.map((point, i) => (
-                      <li key={i} className="text-gray-700 leading-relaxed flex items-start">
-                        <span className="text-gray-900 mr-2">•</span>
+                      <li key={i} className="text-gray-700 leading-relaxed flex items-start text-sm sm:text-base">
+                        <span className="text-gray-900 mr-2 flex-shrink-0">•</span>
                         <span className="flex-1">{point}</span>
                       </li>
                     ))}
@@ -580,8 +593,8 @@ const ResumePreview = ({ resumeData }) => {
             <div className="space-y-3">
               {projects?.map((proj, index) => (
                 <div key={index}>
-                  <div className="font-bold text-lg text-gray-900 mb-1">{proj.name}</div>
-                  <div className="text-gray-700 leading-relaxed">{proj.description}</div>
+                  <div className="font-bold text-base sm:text-lg text-gray-900 mb-1">{proj.name}</div>
+                  <div className="text-gray-700 leading-relaxed text-sm sm:text-base">{proj.description}</div>
                 </div>
               ))}
             </div>
@@ -590,7 +603,7 @@ const ResumePreview = ({ resumeData }) => {
           {/* Skills */}
           <div>
             <SectionTitle title="SKILLS" />
-            <p className="text-gray-800 leading-relaxed">
+            <p className="text-gray-800 leading-relaxed text-sm sm:text-base">
               {skills?.join(' • ')}
             </p>
           </div>
