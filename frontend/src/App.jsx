@@ -7,7 +7,7 @@ import AddEmployeeModal from './components/AddEmployeeModal';
 import Toast from './components/Toast';
 
 // Set the base URL for all axios requests
-axios.defaults.baseURL = 'http://localhost:5001';
+axios.defaults.baseURL = 'https://ai-resume-builder-1-gqbu.onrender.com';
 
 export default function App() {
   const [employees, setEmployees] = useState([]);
