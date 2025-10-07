@@ -21,14 +21,21 @@ const generateResume = async (req, res) => {
     const baseResumeString = JSON.stringify(employee.baseResume);
 
     const prompt = `
-        You are an expert technical resume writer. Your task is to rewrite the 'experience', 'projects', and 'skills' sections of the following base resume to perfectly align with the provided job description.
+        You are an expert technical resume writer specializing in tailoring resumes for specific job applications. Your task is to intelligently adapt the provided base resume to perfectly match the job description.
 
-        **Instructions:**
-        1.  Analyze the **Job Description** to identify key skills, technologies, and responsibilities.
-        2.  Rewrite the bullet points in the **Base Resume**'s 'experience' and 'projects' sections to highlight the most relevant aspects. Use action verbs and keywords from the job description.
-        3.  Do NOT invent new experiences, jobs, or projects. Only rephrase and tailor the existing content.
-        4.  Re-order the 'skills' list to prioritize the skills mentioned in the job description.
-        5.  The output MUST be a valid JSON object with three keys: "experience", "projects", and "skills". The structure must match the input base resume structure.
+        **IMPORTANT INSTRUCTIONS:**
+
+        1. **Analyze Job Requirements**: Carefully read the job description to identify required experience level, key technologies, and specific responsibilities.
+
+        2. **Adapt Experience Dates**: Adjust the "period" fields in experience to reflect appropriate duration based on job requirements (e.g., if job asks for 4+ years, ensure experience spans show adequate time).
+
+        3. **Enhance Projects**: Modify project descriptions and add relevant technical details that align with job requirements. You may add 1-2 new projects if they logically fit the candidate's background and job needs.
+
+        4. **Tailor Content**: Rewrite bullet points to include keywords, technologies, and achievements mentioned in the job description while maintaining authenticity.
+
+        5. **Skills Prioritization**: Reorder skills to prioritize those mentioned in the job description, adding 2-3 relevant skills if they logically fit.
+
+        6. **Maintain Structure**: Keep the exact same JSON structure with "experience", "projects", and "skills" keys.
 
         **Job Description:**
         \`\`\`
@@ -40,17 +47,24 @@ const generateResume = async (req, res) => {
         ${baseResumeString}
         \`\`\`
 
-        **Output (JSON format only):**
+        **Output Requirements:**
+        - Return ONLY valid JSON
+        - Structure: { "experience": [...], "projects": [...], "skills": [...] }
+        - Adapt dates realistically (don't exceed current year)
+        - Add relevant but authentic projects and skills
+        - Use job-specific keywords and terminology
     `;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: "json_object" },
+      max_tokens: 2000,
+      temperature: 0.7,
     });
-    
+
     const tailoredResume = JSON.parse(response.choices[0].message.content);
-    
+
     // Combine original data with new AI-generated data
     const finalResume = {
       name: employee.name,
