@@ -23,19 +23,30 @@ const generateResume = async (req, res) => {
     const prompt = `
         You are an expert technical resume writer specializing in tailoring resumes for specific job applications. Your task is to intelligently adapt the provided base resume to perfectly match the job description.
 
-        **IMPORTANT INSTRUCTIONS:**
+        **CRITICAL REQUIREMENTS:**
 
-        1. **Analyze Job Requirements**: Carefully read the job description to identify required experience level, key technologies, and specific responsibilities.
+        1. **EXPERIENCE DATES - MUST ADJUST FOR JOB REQUIREMENTS:**
+           - If job requires 4+ years experience, ensure experience spans show AT LEAST 4-5 years total
+           - Current year is 2024, so adjust dates realistically (e.g., 2019-2024, 2018-2023, etc.)
+           - Make dates progressive and realistic - earlier jobs should have earlier dates
+           - Calculate total experience to meet job requirements
 
-        2. **Adapt Experience Dates**: Adjust the "period" fields in experience to reflect appropriate duration based on job requirements (e.g., if job asks for 4+ years, ensure experience spans show adequate time).
+        2. **PROJECTS - MINIMUM 3-4 PROJECTS:**
+           - Ensure AT LEAST 3-4 projects in the resume
+           - Add 1-2 new projects if needed to reach minimum
+           - Each project description must be 40-50 words long
+           - Include specific technologies, challenges, and outcomes
 
-        3. **Enhance Projects**: Modify project descriptions and add relevant technical details that align with job requirements. You may add 1-2 new projects if they logically fit the candidate's background and job needs.
+        3. **PROJECT DESCRIPTIONS - DETAILED (40-50 WORDS):**
+           - Write comprehensive project descriptions (40-50 words each)
+           - Include: technologies used, challenges faced, solutions implemented, results achieved
+           - Use job-relevant keywords and technical details
+           - Show impact and quantifiable results where possible
 
-        4. **Tailor Content**: Rewrite bullet points to include keywords, technologies, and achievements mentioned in the job description while maintaining authenticity.
-
-        5. **Skills Prioritization**: Reorder skills to prioritize those mentioned in the job description, adding 2-3 relevant skills if they logically fit.
-
-        6. **Maintain Structure**: Keep the exact same JSON structure with "experience", "projects", and "skills" keys.
+        4. **SKILLS ENHANCEMENT:**
+           - Add job-specific skills if missing
+           - Prioritize skills mentioned in job description
+           - Maintain authenticity with candidate's background
 
         **Job Description:**
         \`\`\`
@@ -47,12 +58,12 @@ const generateResume = async (req, res) => {
         ${baseResumeString}
         \`\`\`
 
-        **Output Requirements:**
-        - Return ONLY valid JSON
-        - Structure: { "experience": [...], "projects": [...], "skills": [...] }
-        - Adapt dates realistically (don't exceed current year)
-        - Add relevant but authentic projects and skills
-        - Use job-specific keywords and terminology
+        **OUTPUT REQUIREMENTS:**
+        - Return ONLY valid JSON with structure: { "experience": [...], "projects": [...], "skills": [...] }
+        - Experience periods MUST reflect required experience level (4+ years minimum for this job)
+        - Minimum 3-4 projects with detailed 40-50 word descriptions
+        - Use current year 2024 as reference for date calculations
+        - Add relevant technical projects that fit the job requirements
     `;
 
     const response = await openai.chat.completions.create({
