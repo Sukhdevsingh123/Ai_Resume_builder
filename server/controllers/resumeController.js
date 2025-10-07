@@ -28,22 +28,30 @@ const generateResume = async (req, res) => {
         1. **EXPERIENCE DATES - MUST ADJUST FOR JOB REQUIREMENTS:**
            - If job requires 4+ years experience, ensure experience spans show AT LEAST 4-5 years total
            - Current year is 2024, so adjust dates realistically (e.g., 2019-2024, 2018-2023, etc.)
+           - **CRITICAL: Experience dates MUST be in CHRONOLOGICAL order**
+           - **Each subsequent job MUST start AFTER the previous job ends**
+           - **NO OVERLAPPING dates between experiences**
            - Make dates progressive and realistic - earlier jobs should have earlier dates
            - Calculate total experience to meet job requirements
 
-        2. **PROJECTS - MINIMUM 3-4 PROJECTS:**
+        2. **EXPERIENCE DATE FORMAT:**
+           - Use format: "Jan 2020 – Dec 2022" or "Mar 2021 - Present"
+           - Ensure proper chronological progression: Job 1 (earliest) → Job 2 → Job 3 (current)
+           - **Example for 4+ years: Jan 2019 – Dec 2022 (Job 1), Jan 2023 - Present (Job 2)**
+
+        3. **PROJECTS - MINIMUM 3-4 PROJECTS:**
            - Ensure AT LEAST 3-4 projects in the resume
            - Add 1-2 new projects if needed to reach minimum
            - Each project description must be 40-50 words long
            - Include specific technologies, challenges, and outcomes
 
-        3. **PROJECT DESCRIPTIONS - DETAILED (40-50 WORDS):**
+        4. **PROJECT DESCRIPTIONS - DETAILED (40-50 WORDS):**
            - Write comprehensive project descriptions (40-50 words each)
            - Include: technologies used, challenges faced, solutions implemented, results achieved
            - Use job-relevant keywords and technical details
            - Show impact and quantifiable results where possible
 
-        4. **SKILLS ENHANCEMENT:**
+        5. **SKILLS ENHANCEMENT:**
            - Add job-specific skills if missing
            - Prioritize skills mentioned in job description
            - Maintain authenticity with candidate's background
@@ -61,6 +69,7 @@ const generateResume = async (req, res) => {
         **OUTPUT REQUIREMENTS:**
         - Return ONLY valid JSON with structure: { "experience": [...], "projects": [...], "skills": [...] }
         - Experience periods MUST reflect required experience level (4+ years minimum for this job)
+        - **Experience dates MUST be in strict chronological order with NO overlaps**
         - Minimum 3-4 projects with detailed 40-50 word descriptions
         - Use current year 2024 as reference for date calculations
         - Add relevant technical projects that fit the job requirements
