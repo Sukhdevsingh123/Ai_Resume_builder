@@ -7,7 +7,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-// Seed the database with sample data
+
 const seedDatabase = async (req, res) => {
     try {
         await Employee.deleteMany({}); // Clear existing data
