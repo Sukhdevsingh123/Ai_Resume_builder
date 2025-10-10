@@ -12,14 +12,19 @@ const ProjectSchema = new mongoose.Schema({
   description: String,
 });
 
+const ResumeDataSchema = new mongoose.Schema({
+  experience: [ExperienceSchema],
+  projects: [ProjectSchema],
+  skills: [String],
+});
+
 const EmployeeSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phone: String,
   telegram: String,
-  baseResume: {
-    experience: [ExperienceSchema],
-    projects: [ProjectSchema],
-    skills: [String],
+  resumeData: {
+    freelance: ResumeDataSchema,
+    techstack: ResumeDataSchema,
   },
 });
 

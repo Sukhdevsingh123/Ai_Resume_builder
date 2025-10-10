@@ -1,0 +1,11 @@
+/* Remove any default borders that might appear on resume sections */
+.resume-section h2 {
+  border: none !important;
+  border-bottom: none !important;
+  border-top: none !important;
+}
+
+.resume-section {
+  border: none !important;
+  border-bottom: none !important;
+}

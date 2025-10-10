@@ -3,10 +3,11 @@ import { useState } from 'react';
 const ControlPanel = ({ employees, onGenerate, isLoading, onOpenAddModal }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+  const [templateType, setTemplateType] = useState('freelance');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onGenerate({ employeeId: selectedEmployee, jobDescription });
+    onGenerate({ employeeId: selectedEmployee, jobDescription, templateType });
   };
 
   return (
@@ -47,12 +48,79 @@ const ControlPanel = ({ employees, onGenerate, isLoading, onOpenAddModal }) => {
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            2. Select Resume Template
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-200 ${
+              templateType === 'freelance'
+                ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                : 'border-gray-300 hover:border-gray-400'
+            }`}>
+              <input
+                type="radio"
+                name="templateType"
+                value="freelance"
+                checked={templateType === 'freelance'}
+                onChange={(e) => setTemplateType(e.target.value)}
+                className="sr-only"
+              />
+              <div className="flex items-center">
+                <div className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center ${
+                  templateType === 'freelance'
+                    ? 'border-indigo-500 bg-indigo-500'
+                    : 'border-gray-300'
+                }`}>
+                  {templateType === 'freelance' && (
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                  )}
+                </div>
+                <div>
+                  <div className="font-medium">Freelance</div>
+                  <div className="text-xs text-gray-500">Professional & Creative</div>
+                </div>
+              </div>
+            </label>
+
+            <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors duration-200 ${
+              templateType === 'techstack'
+                ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                : 'border-gray-300 hover:border-gray-400'
+            }`}>
+              <input
+                type="radio"
+                name="templateType"
+                value="techstack"
+                checked={templateType === 'techstack'}
+                onChange={(e) => setTemplateType(e.target.value)}
+                className="sr-only"
+              />
+              <div className="flex items-center">
+                <div className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center ${
+                  templateType === 'techstack'
+                    ? 'border-indigo-500 bg-indigo-500'
+                    : 'border-gray-300'
+                }`}>
+                  {templateType === 'techstack' && (
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                  )}
+                </div>
+                <div>
+                  <div className="font-medium">TechStack</div>
+                  <div className="text-xs text-gray-500">Technical & Enterprise</div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div>
           <label htmlFor="job-description" className="block text-sm font-medium text-gray-700 mb-1">
-            2. Paste Job Description
+            3. Paste Job Description
           </label>
           <textarea
             id="job-description"
-            rows="12 sm:rows-15"
+            rows="8 sm:rows-10"
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
             className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full text-sm sm:text-base border border-gray-300 rounded-md p-3 transition-colors duration-200 resize-vertical"

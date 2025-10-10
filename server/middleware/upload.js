@@ -15,4 +15,10 @@ const upload = multer({
   },
 });
 
-module.exports = upload;
+// Middleware for handling multiple resume uploads
+const uploadResumes = upload.fields([
+  { name: 'freelanceFile', maxCount: 1 },
+  { name: 'techstackFile', maxCount: 1 }
+]);
+
+module.exports = uploadResumes;

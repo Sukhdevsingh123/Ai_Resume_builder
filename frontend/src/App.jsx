@@ -10,7 +10,7 @@ import Toast from './components/Toast';
 axios.defaults.baseURL = 'https://ai-resume-builder-2-w0b4.onrender.com';
 
 
-// axios.defaults.baseURL="http://localhost:5001";
+//  axios.defaults.baseURL="http://localhost:5001";
 
 export default function App() {
   const [employees, setEmployees] = useState([]);
@@ -40,10 +40,10 @@ export default function App() {
     fetchEmployees();
   }, []);
 
-  const handleGenerateResume = async ({ employeeId, jobDescription }) => {
-    if (!employeeId || !jobDescription) {
-        setError('Please select an employee and provide a job description.');
-        showToast('Please select an employee and provide a job description', 'error');
+  const handleGenerateResume = async ({ employeeId, jobDescription, templateType }) => {
+    if (!employeeId || !jobDescription || !templateType) {
+        setError('Please select an employee, template type, and provide a job description.');
+        showToast('Please select an employee, template type, and provide a job description', 'error');
         return;
     }
     setIsLoading(true);
@@ -53,7 +53,7 @@ export default function App() {
     showToast('Generating your tailored resume...', 'info');
 
     try {
-      const response = await axios.post('/api/generate-resume', { employeeId, jobDescription });
+      const response = await axios.post('/api/generate-resume', { employeeId, jobDescription, templateType });
       setGeneratedResume(response.data);
       showToast('Resume generated successfully! 🎉', 'success');
     } catch (err) {
@@ -67,6 +67,7 @@ export default function App() {
 
   const handleAddEmployee = async (formData) => {
     try {
+        // Don't set Content-Type header - let axios set it automatically with boundary for FormData
         await axios.post('/api/employees', formData);
         setIsModalOpen(false);
         fetchEmployees();

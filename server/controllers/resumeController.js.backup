@@ -383,12 +383,10 @@ Return ONLY the summary text with **bold** formatting for important words, no qu
         return `\n\\resumeSubItem{${name}}\n  {${description}}`;
       }).join('') || '';
 
-      // Format skills with enhanced categories
-      const coreSkills = tailoredResume.skills?.slice(0, Math.ceil(tailoredResume.skills?.length / 2)) || [];
-      const skillsLatex = `
-\\item{\\textbf{Core Technologies:} ${coreSkills.map(skill => escapeLatex(skill)).join(' • ')}}
-\\item{\\textbf{Tools & Technologies:} Git • GitHub • VS Code • Postman • REST APIs • JSON • Agile/Scrum • Problem Solving • Debugging • Code Review}
-\\item{\\textbf{Development Fundamentals:} HTML5 • CSS3 • JavaScript (ES6+) • Responsive Design • Cross-browser Compatibility • Version Control • Documentation}`;
+      // Format skills - simple join like frontend
+      const skillsLatex = tailoredResume.skills?.map(skill => {
+        return escapeLatex(skill);
+      }).join(' • ') || '';
 
       // Process summary to add bold formatting
       let processedSummary = escapeLatex(professionalSummary);
@@ -438,8 +436,8 @@ Return ONLY the summary text with **bold** formatting for important words, no qu
 
 % Sections formatting
 \\titleformat{\\section}{
-  \\vspace{-4pt}\\scshape\\raggedright\\normalsize
-}{}{0em}{}[\\vspace{-5pt}]
+  \\vspace{-4pt}\\scshape\\raggedright\\large
+}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]
 
 %-------------------------
 % Custom commands
@@ -471,13 +469,17 @@ Return ONLY the summary text with **bold** formatting for important words, no qu
 
 \\begin{document}
 %----------HEADING-----------------
-{\\large \\textbf{${escapeLatex(name)}}}
+\\begin{center}
+    {\\LARGE \\textbf{${escapeLatex(name)}}}
+\\end{center}
 
 %-----------SUMMARY-----------------
 \\noindent
 \\begin{tabular*}{\\textwidth}{l@{\\extracolsep{\\fill}}r}
-    \\textbf{\\normalsize Summary} & \\textbf{Freelance Rate: \\$150 / hour} \\\\
+    \\textbf{\\large Summary} & \\textbf{Freelance Rate: \\$150 / hour} \\\\
 \\end{tabular*}
+\\vspace{-3pt}
+\\hrule
 
 \\vspace{2pt}
 ${processedSummary}
@@ -497,16 +499,13 @@ ${projectsLatex}
 %-----------SKILLS------------
 \\section{Skills}
 \\resumeSubHeadingListStart
-${skillsLatex}
+\\item{${skillsLatex}}
 \\resumeSubHeadingListEnd
 
 \\end{document}`;
-    };
 
     // Generate the LaTeX resume
     const latexResume = generateLatexResume(employee, tailoredResume, professionalSummary, styling);
-
-    // Return JSON with LaTeX content included
     const finalResume = {
       name: employee.name,
       phone: employee.phone,
