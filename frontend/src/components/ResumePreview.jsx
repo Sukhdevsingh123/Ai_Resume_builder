@@ -942,7 +942,7 @@ const ResumePreview = ({ resumeData }) => {
 
         {/* Professional Summary */}
         <div className="mb-6 resume-section">
-          <SectionTitle title="PROFESSIONAL SUMMARY" />
+          <SectionTitle title="SUMMARY" />
           <div
             className="text-gray-700 leading-relaxed text-sm sm:text-base italic"
             dangerouslySetInnerHTML={{ __html: processText(generateDynamicSummary()) }}

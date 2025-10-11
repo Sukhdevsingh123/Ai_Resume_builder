@@ -165,9 +165,9 @@ export const useBulkResumeGenerator = () => {
         <meta charset="UTF-8"> <title>${name} - Resume</title>
         <style>
           body { background: #fff; margin: 0; font-family: "Times New Roman", Times, serif; font-size: 10.5pt; line-height: 1.25; color: #000; }
-          .page { width: 8.5in; height: 11in; padding: 0.5in 0.75in; box-sizing: border-box; margin: 0 auto; }
+          .page { width: 8.5in; height: 11in; padding: 0.4in 0.75in; box-sizing: border-box; margin: 0 auto; }
           strong { font-weight: bold; }
-          .header { text-align: left; margin-bottom: 10pt; }
+          .header { text-align: left; margin-bottom: 5pt; }
           .header .name { font-size: 18pt; font-weight: bold; letter-spacing: 1px; }
           .summary-header { display: flex; justify-content: space-between; align-items: flex-end; }
           .summary-header .title { font-size: 12pt; font-weight: bold; }
@@ -180,7 +180,7 @@ export const useBulkResumeGenerator = () => {
           .subheading-grid { display: flex; justify-content: space-between; margin-bottom: -2pt; }
           .subheading-grid .company { font-weight: bold; font-size: 10.5pt; }
           .subheading-grid .date { font-size: 10.5pt; }
-          .role { font-style: italic; font-size: 10pt; color: #333; margin-bottom: 2pt; }
+          .role { font-style: italic; font-weight: bold; font-size: 11pt; color: #1f2937; margin-bottom: 2pt; margin-left: 12pt; }
           ul.details-list { list-style: none; padding-left: 12pt; margin: 0; }
           ul.details-list li { font-size: 10pt; margin-bottom: 1pt; position: relative; padding-left: 10pt; }
           ul.details-list li::before { content: '◦'; position: absolute; left: 0; top: 1px; }
@@ -218,7 +218,7 @@ export const useBulkResumeGenerator = () => {
     `;
   };
 
-  // --- PDF GENERATION & MAIN LOGIC (SINGLE-PAGE) ---
+  // --- PDF GENERATION & MAIN LOGIC (OPTIMIZED) ---
   const generateAndDownloadPDF = async (htmlContent, filename) => {
     try {
       if (!htmlContent || htmlContent.trim() === '') throw new Error('HTML content is empty or invalid');
@@ -230,20 +230,67 @@ export const useBulkResumeGenerator = () => {
       container.style.left = '-9999px';
       container.style.top = '0';
       document.body.appendChild(container);
-      
+
       const contentToCapture = container.querySelector('.page');
+
+      // Reduced scale for smaller file size but still good quality
+      const scale = 2; // Reduced from 3 to 2
+
       const canvas = await html2canvas(contentToCapture, {
-        scale: 3,
+        scale: scale,
         useCORS: true,
         width: contentToCapture.offsetWidth,
-        height: contentToCapture.offsetHeight
+        height: contentToCapture.offsetHeight,
+        // Optimize for smaller file size
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        removeContainer: true,
+        // Reduce image quality for smaller file size
+        quality: 0.8
       });
 
       document.body.removeChild(container);
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter' });
-      pdf.addImage(imgData, 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+
+      // Convert to PNG with reduced quality for smaller file size
+      const imgData = canvas.toDataURL('image/jpeg', 0.75); // Use JPEG with 75% quality
+      console.log('Image data created, size:', Math.round(imgData.length / 1024), 'KB');
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'in',
+        format: 'letter',
+        compress: true, // Enable compression
+        precision: 2, // Reduce precision for smaller size
+        floatPrecision: 2
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const imgAspectRatio = imgWidth / imgHeight;
+      const pageAspectRatio = pdfWidth / pdfHeight;
+
+      let finalWidth, finalHeight;
+      if (imgAspectRatio > pageAspectRatio) {
+        finalWidth = pdfWidth;
+        finalHeight = pdfWidth / imgAspectRatio;
+      } else {
+        finalHeight = pdfHeight;
+        finalWidth = pdfHeight * imgAspectRatio;
+      }
+
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
+
+      console.log('Adding image to PDF...');
+      pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight, '', 'FAST');
+
+      // Clean up and save
       pdf.save(filename);
+      console.log('PDF saved successfully!');
+
       return true;
     } catch (error) {
       console.error('PDF generation failed:', error);
