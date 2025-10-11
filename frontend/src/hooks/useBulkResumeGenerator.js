@@ -165,14 +165,14 @@ export const useBulkResumeGenerator = () => {
         <meta charset="UTF-8"> <title>${name} - Resume</title>
         <style>
           body { background: #fff; margin: 0; font-family: "Times New Roman", Times, serif; font-size: 10.5pt; line-height: 1.25; color: #000; }
-          .page { width: 8.5in; height: 11in; padding: 0.4in 0.75in; box-sizing: border-box; margin: 0 auto; }
+          .page { width: 8.5in; height: 11in; padding: 0.3in 0.75in; box-sizing: border-box; margin: 0 auto; }
           strong { font-weight: bold; }
-          .header { text-align: left; margin-bottom: 5pt; }
+          .header { text-align: left; margin-bottom: 3pt; }
           .header .name { font-size: 18pt; font-weight: bold; letter-spacing: 1px; }
           .summary-header { display: flex; justify-content: space-between; align-items: flex-end; }
           .summary-header .title { font-size: 12pt; font-weight: bold; }
           .summary-header .rate { font-size: 10.5pt; font-weight: bold; }
-          .divider { border-bottom: 0.5pt solid black; margin-top: 1pt; margin-bottom: 3pt; }
+          .divider { border-bottom: 0.5pt solid black; margin-top: 1pt; margin-bottom: 2pt; }
           .summary-text { font-size: 10pt; text-align: left; }
           .section-title { font-size: 12pt; font-variant: small-caps; font-weight: bold; letter-spacing: 0.5px; border-bottom: 0.5pt solid black; padding-bottom: 1pt; margin-top: 8pt; margin-bottom: 4pt; }
           .item-list { padding-left: 0; list-style: none; }
