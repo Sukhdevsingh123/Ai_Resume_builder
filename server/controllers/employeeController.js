@@ -11,7 +11,7 @@ const openai = new OpenAI({
 const seedDatabase = async (req, res) => {
     try {
         await Employee.deleteMany({}); // Clear existing data
-        await Employee.create(sampleResume);
+        await Employee.insertMany(sampleResume); // Use insertMany for array of documents
         res.status(201).json({ message: 'Database seeded successfully' });
     } catch (error) {
         console.error('Error seeding database:', error);
@@ -22,7 +22,7 @@ const seedDatabase = async (req, res) => {
 // Get all employees (only name and id)
 const getEmployees = async (req, res) => {
     try {
-        const employees = await Employee.find().select('name');
+        const employees = await Employee.find().select('name resumeData'); // Include resumeData for bulk generation
         res.json(employees);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching employees' });
@@ -76,7 +76,8 @@ const addEmployee = async (req, res) => {
         console.log('Received files:', req.files);
         console.log('File keys:', Object.keys(req.files || {}));
 
-        const { freelanceFile, techstackFile } = req.files;
+    // Guard against missing req.files (multer may not populate it on error)
+    const { freelanceFile, techstackFile } = req.files || {};
 
         if (!freelanceFile && !techstackFile) {
             clearTimeout(timeout);

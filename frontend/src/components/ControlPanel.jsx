@@ -1,13 +1,36 @@
 import { useState } from 'react';
+import { useBulkResumeGenerator } from '../hooks/useBulkResumeGenerator';
 
 const ControlPanel = ({ employees, onGenerate, isLoading, onOpenAddModal }) => {
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [templateType, setTemplateType] = useState('freelance');
+  const [bulkJobDescription, setBulkJobDescription] = useState('');
+
+  // Bulk resume generation hook
+  const { generateAllResumes, isGenerating, progress, cancelGeneration } = useBulkResumeGenerator();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onGenerate({ employeeId: selectedEmployee, jobDescription, templateType });
+  };
+
+  const handleBulkGeneration = async (resumeType) => {
+    if (!bulkJobDescription.trim()) {
+      alert('Please enter a job description for bulk generation');
+      return;
+    }
+
+    if (!window.confirm(`Generate ${resumeType} resumes for all employees? This may take several minutes.`)) {
+      return;
+    }
+
+    try {
+      await generateAllResumes(resumeType, bulkJobDescription);
+      alert('Bulk resume generation completed!');
+    } catch (error) {
+      alert(`Bulk generation failed: ${error.message}`);
+    }
   };
 
   return (
@@ -24,6 +47,79 @@ const ControlPanel = ({ employees, onGenerate, isLoading, onOpenAddModal }) => {
           </svg>
           Add New Employee
         </button>
+      </div>
+
+      {/* Bulk Resume Generation Section */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+        <h3 className="text-lg font-semibold mb-3 text-gray-800">Bulk Resume Generation</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Generate resumes for all employees at once. Each resume will be automatically downloaded.
+        </p>
+
+        <div className="mb-4">
+          <label htmlFor="bulk-job-description" className="block text-sm font-medium text-gray-700 mb-2">
+            Job Description for Bulk Generation
+          </label>
+          <textarea
+            id="bulk-job-description"
+            rows="4"
+            value={bulkJobDescription}
+            onChange={(e) => setBulkJobDescription(e.target.value)}
+            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-sm border border-gray-300 rounded-md p-3 transition-colors duration-200 resize-vertical"
+            placeholder="Paste the job description that will be used for all resumes..."
+          />
+        </div>
+
+        {isGenerating && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-blue-800">
+                Generating resume {progress.current} of {progress.total}
+              </span>
+              <button
+                onClick={cancelGeneration}
+                className="text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="w-full bg-blue-200 rounded-full h-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(progress.current / progress.total) * 100}%` }}
+              ></div>
+            </div>
+            {progress.currentEmployee && (
+              <p className="text-xs text-blue-700 mt-1">
+                Processing: {progress.currentEmployee}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={() => handleBulkGeneration('freelance')}
+            disabled={isGenerating || !bulkJobDescription.trim()}
+            className="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            </svg>
+            {isGenerating ? 'Generating...' : 'All Freelancer Resumes'}
+          </button>
+
+          <button
+            onClick={() => handleBulkGeneration('techstack')}
+            disabled={isGenerating || !bulkJobDescription.trim()}
+            className="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            {isGenerating ? 'Generating...' : 'All Techstack Resumes'}
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
