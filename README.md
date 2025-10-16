@@ -23,6 +23,9 @@
 
 <div align="center">
   <a href="https://airesume-builder-ni.vercel.app/">
+    <img src="https://github.com/Sukhdevsingh123/Ai_Resume_builder/raw/main/frontend/src/assets/resume_builder2.png" alt="Project Screenshot">
+  </a>
+  <a href="https://airesume-builder-ni.vercel.app/">
     <img src="https://github.com/Sukhdevsingh123/Ai_Resume_builder/raw/main/frontend/src/assets/resume_builder.png" alt="Project Screenshot">
   </a>
 </div>
