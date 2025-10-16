@@ -225,7 +225,8 @@ export const useBulkResumeGenerator = () => {
       const container = document.createElement('div');
       container.innerHTML = htmlContent;
       container.style.width = '8.5in';
-      container.style.height = '11in';
+      // let content determine its height so we can capture full content and then scale down
+      container.style.height = 'auto';
       container.style.position = 'absolute';
       container.style.left = '-9999px';
       container.style.top = '0';
@@ -233,59 +234,92 @@ export const useBulkResumeGenerator = () => {
 
       const contentToCapture = container.querySelector('.page');
 
-      // Reduced scale for smaller file size but still good quality
-      const scale = 2; // Reduced from 3 to 2
+      // Compute a scale so the rendered canvas will fit inside a single PDF page.
+      // We'll compare the element size (in CSS px) with the target PDF size (in inches -> px at 96dpi)
+      // Try to infer CSS pixels per inch from the rendered element if possible,
+      // otherwise fallback to common assumption 96.
+      let pxPerInch = 96; // CSS pixels per inch (common browser assumption)
+      try {
+        // contentToCapture may already be in the DOM; compute px/in from its width and the PDF width in inches
+        const measuredPxPerInch = contentToCapture.offsetWidth / pdfWidthIn;
+        if (measuredPxPerInch && isFinite(measuredPxPerInch)) pxPerInch = measuredPxPerInch;
+      } catch (e) {
+        // fallback to default pxPerInch
+      }
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter', compress: true, precision: 2, floatPrecision: 2 });
+      const pdfWidthIn = pdf.internal.pageSize.getWidth();
+      const pdfHeightIn = pdf.internal.pageSize.getHeight();
+
+      const targetPxWidth = pdfWidthIn * pxPerInch;
+      const targetPxHeight = pdfHeightIn * pxPerInch;
+
+      // Element dimensions (CSS pixels)
+      const contentWidth = contentToCapture.offsetWidth || Math.round(targetPxWidth);
+      const contentHeight = contentToCapture.scrollHeight || Math.round(targetPxHeight);
+
+      // html2canvas default scale is window.devicePixelRatio. We'll pick a base max scale for quality.
+      const defaultMaxScale = 2; // keep quality reasonable
+      const devicePR = window.devicePixelRatio || 1;
+
+      // Determine the maximum scale that keeps the rendered canvas within target PDF pixel size
+      const maxScaleForWidth = targetPxWidth / contentWidth;
+      const maxScaleForHeight = targetPxHeight / contentHeight;
+      // Use the smallest of defaultMaxScale and the calculated limits. This allows downscaling when content is large.
+      let usedScale = Math.min(defaultMaxScale, maxScaleForWidth, maxScaleForHeight);
+      // Don't allow extremely small scales which make text unreadable; clamp to a minimum
+      usedScale = Math.max(usedScale, 0.45);
 
       const canvas = await html2canvas(contentToCapture, {
-        scale: scale,
+        scale: usedScale * devicePR,
         useCORS: true,
-        width: contentToCapture.offsetWidth,
-        height: contentToCapture.offsetHeight,
-        // Optimize for smaller file size
+        width: contentWidth,
+        height: contentHeight,
         allowTaint: false,
         backgroundColor: '#ffffff',
         removeContainer: true,
-        // Reduce image quality for smaller file size
-        quality: 0.8
+        // html2canvas's `quality` only applies to toDataURL/jpeg conversion, we'll control that later
       });
 
       document.body.removeChild(container);
 
       // Convert to PNG with reduced quality for smaller file size
-      const imgData = canvas.toDataURL('image/jpeg', 0.75); // Use JPEG with 75% quality
+      const imgData = canvas.toDataURL('image/jpeg', 0.78); // Slightly higher quality but still compressed
       console.log('Image data created, size:', Math.round(imgData.length / 1024), 'KB');
 
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'in',
-        format: 'letter',
-        compress: true, // Enable compression
-        precision: 2, // Reduce precision for smaller size
-        floatPrecision: 2
-      });
-
+      // Place the generated canvas into the existing PDF instance ensuring it fits the page.
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const imgAspectRatio = imgWidth / imgHeight;
+      // Convert canvas pixel dimensions to inches for jsPDF placement
+      const canvasPxWidth = canvas.width; // actual canvas width in px
+      const canvasPxHeight = canvas.height; // actual canvas height in px
+  // Convert canvas pixel dimensions to inches for jsPDF placement.
+  // Account for devicePixelRatio because canvas.width includes device pixels.
+  const canvasInWidth = canvasPxWidth / (pxPerInch * devicePR);
+  const canvasInHeight = canvasPxHeight / (pxPerInch * devicePR);
+
+      const imgAspectRatio = canvasInWidth / canvasInHeight;
       const pageAspectRatio = pdfWidth / pdfHeight;
 
-      let finalWidth, finalHeight;
+      let finalWidthIn, finalHeightIn;
       if (imgAspectRatio > pageAspectRatio) {
-        finalWidth = pdfWidth;
-        finalHeight = pdfWidth / imgAspectRatio;
+        finalWidthIn = pdfWidth;
+        finalHeightIn = pdfWidth / imgAspectRatio;
       } else {
-        finalHeight = pdfHeight;
-        finalWidth = pdfHeight * imgAspectRatio;
+        finalHeightIn = pdfHeight;
+        finalWidthIn = pdfHeight * imgAspectRatio;
       }
 
-      const xOffset = (pdfWidth - finalWidth) / 2;
-      const yOffset = (pdfHeight - finalHeight) / 2;
+      // Apply a small safety factor to ensure the image never slightly overflows the page due to rounding
+      const safetyFactor = 0.96; // shrink to 96% of computed size
+      finalWidthIn = finalWidthIn * safetyFactor;
+      finalHeightIn = finalHeightIn * safetyFactor;
 
-      console.log('Adding image to PDF...');
-      pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight, '', 'FAST');
+      const xOffsetIn = (pdfWidth - finalWidthIn) / 2;
+      const yOffsetIn = (pdfHeight - finalHeightIn) / 2;
+
+      console.log('Adding image to PDF...', { canvasPxWidth, canvasPxHeight, finalWidthIn, finalHeightIn, pxPerInch, devicePR });
+      pdf.addImage(imgData, 'JPEG', xOffsetIn, yOffsetIn, finalWidthIn, finalHeightIn, '', 'FAST');
 
       // Clean up and save
       pdf.save(filename);
@@ -441,3 +475,7 @@ export const useBulkResumeGenerator = () => {
     isCancelled
   };
 };
+
+
+
+
