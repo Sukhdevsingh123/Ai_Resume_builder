@@ -1,5 +1,4 @@
 
-
 import { useState } from 'react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
@@ -114,24 +113,36 @@ export const useBulkResumeGenerator = () => {
   };
 
   const generateDynamicSkills = (skills, jobDescription) => {
-    if (skills && skills.length > 0) return skills;
+    // Baseline/default skills to include in all generated resumes
+    const baselineSkills = [
+      'JavaScript', 'TypeScript', 'Python', 'SQL', 'HTML/CSS',
+      'React', 'Node.js', 'Express', 'MongoDB', 'MERN Stack',
+      'Docker', 'Git', 'GitHub Actions', 'Jenkins', 'AWS', 'CI/CD',
+      'EVM', 'Ethereum', 'Polygon', 'BSC', 'Hyperlane', 'Chainlink', 'Wormhole'
+    ];
+
     const jobLower = (typeof jobDescription === 'string' ? jobDescription : '').toLowerCase();
     const hasRustTerms = /\b(rust|tokio|async-std|wasm|webassembly)\b/.test(jobLower);
     const hasWeb3Terms = /\b(solidity|ethereum|smart.contract|defi|evm)\b/.test(jobLower);
 
+    let generated = [];
     if (hasRustTerms) {
-        return ['Rust', 'Tokio', 'async-std', 'PostgreSQL', 'MySQL', 'Redis', 'RESTful APIs', 'gRPC', 'GraphQL', 'Git', 'CI/CD', 'Docker', 'Kubernetes', 'AWS', 'WebAssembly (WASM)', 'C++', 'Go', 'Python', 'Systems Programming', 'Concurrency'];
+      generated = ['Rust', 'Tokio', 'async-std', 'PostgreSQL', 'MySQL', 'Redis', 'RESTful APIs', 'gRPC', 'GraphQL', 'C++', 'Go', 'Systems Programming', 'Concurrency'];
     } else if (hasWeb3Terms) {
-        return ['Solidity', 'Rust', 'Go', 'JavaScript', 'TypeScript', 'Python', 'React', 'Node.js', 'EVM', 'Ethereum', 'Polygon', 'Solana', 'Hardhat', 'Foundry', 'Docker', 'Git', 'CI/CD', 'AWS', 'ZK-SNARKs', 'JAM Protocol', 'Cross-chain', 'Hyperlane', 'Chainlink CCIP'];
+      generated = ['Solidity', 'Rust', 'Go', 'Hardhat', 'Foundry', 'ZK-SNARKs', 'JAM Protocol', 'Cross-chain'];
     } else {
-        return ['JavaScript', 'TypeScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Express', 'MongoDB', 'SQL', 'Docker', 'Git', 'AWS', 'CI/CD'];
+      generated = ['JavaScript', 'TypeScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Express', 'MongoDB', 'SQL', 'Docker', 'Git', 'AWS', 'CI/CD'];
     }
+
+    // Merge provided skills, generated skills based on job description, and baseline defaults
+    const merged = new Set([...(skills || []), ...generated, ...baselineSkills]);
+
+    return Array.from(merged);
   };
 
-
-  // --- HIGH-FIDELITY LATEX-STYLE HTML TEMPLATE (COMPACT VERSION) ---
+  // --- NEW HTML TEMPLATE FUNCTION ---
   const generateHighQualityResumeHTML = (employeeData, jobDescription) => {
-    const { name, summary, experience, projects, skills } = employeeData;
+    const { name, phone, telegram, summary, experience, projects, skills } = employeeData;
     const dynamicSummary = generateDynamicSummary(summary, jobDescription);
     const dynamicExperience = generateDynamicExperience(experience, jobDescription);
     const dynamicProjects = generateDynamicProjects(projects, jobDescription);
@@ -144,74 +155,104 @@ export const useBulkResumeGenerator = () => {
         return categorySkills;
     };
 
-    const languagesArr = getSkillsArrayForCategory(['rust', 'solidity', 'python', 'javascript', 'go', 'html', 'css', 'typescript', 'c++', 'sql']);
-    const frameworksArr = getSkillsArrayForCategory(['tokio', 'async-std', 'react', 'node.js', 'express', 'next.js', 'anchor']);
-    const databasesArr = getSkillsArrayForCategory(['postgresql', 'mysql', 'redis', 'mongodb']);
-    const blockchainArr = getSkillsArrayForCategory(['ethereum', 'polygon', 'solana', 'evm', 'web3.js', 'ethers.js', 'webassembly', 'zk-snarks', 'jamprotocol', 'cross-chain', 'hyperlane', 'chainlinkccip']);
-    const toolsArr = getSkillsArrayForCategory(['git', 'docker', 'kubernetes', 'aws', 'gcp', 'azure', 'ci/cd', 'hardhat', 'foundry', 'jenkins']);
-    const otherSkillsArr = allSkills.filter(skill => !categorizedSkillsSet.has(skill));
-
+    const languagesArr = getSkillsArrayForCategory(['rust', 'solidity', 'python', 'javascript', 'js', 'go', 'html', 'css', 'typescript', 'ts', 'c++', 'sql']);
+    const frameworksArr = getSkillsArrayForCategory(['tokio', 'async-std', 'react', 'node', 'node.js', 'express', 'next', 'next.js', 'django', 'flask', 'fastapi', 'mern', 'mongodb', 'mongoose']);
+    const toolsArr = getSkillsArrayForCategory(['git', 'github', 'githubactions', 'docker', 'kubernetes', 'aws', 'gcp', 'azure', 'ci/cd', 'cicd', 'jenkins', 'terraform']);
+    const blockchainArr = getSkillsArrayForCategory(['ethereum', 'polygon', 'solana', 'evm', 'web3', 'web3.js', 'ethers', 'ethers.js', 'ipfs', 'filecoin', 'decentralized', 'zk', 'zk-snarks', 'zksnarks', 'smartcontracts', 'smart.contract', 'jamprotocol', 'cross-chain', 'hyperlane', 'chainlink', 'bsc', 'wormhole', 'blockchain', 'hardhat', 'foundry']);
+    
     const languages = languagesArr.join(', ');
     const frameworks = frameworksArr.join(', ');
-    const databases = databasesArr.join(', ');
-    const blockchain = blockchainArr.join(', ');
     const tools = toolsArr.join(', ');
-    const otherSkills = otherSkillsArr.join(', ');
+    const blockchain = blockchainArr.join(', ');
 
     return `
       <!DOCTYPE html>
       <html>
       <head>
-        <meta charset="UTF-8"> <title>${name} - Resume</title>
+        <meta charset="UTF-8">
+        <title>${name} - Resume</title>
         <style>
-          body { background: #fff; margin: 0; font-family: "Times New Roman", Times, serif; font-size: 10.5pt; line-height: 1.25; color: #000; }
-          .page { width: 8.5in; height: 11in; padding: 0.3in 0.75in; box-sizing: border-box; margin: 0 auto; }
+          /* reduce base font size so content more easily fits a single PDF page while remaining readable */
+          html { font-size: 14px; }
+          body { background-color: #ffffff; margin: 0; font-family: Georgia, serif; color: #2c3e50; }
+          .page-container { width: 8.5in; min-height: 14in;  box-sizing: border-box; margin: 0 auto; }
           strong { font-weight: bold; }
-          .header { text-align: left; margin-bottom: 3pt; }
-          .header .name { font-size: 18pt; font-weight: bold; letter-spacing: 1px; }
-          .summary-header { display: flex; justify-content: space-between; align-items: flex-end; }
-          .summary-header .title { font-size: 12pt; font-weight: bold; }
-          .summary-header .rate { font-size: 10.5pt; font-weight: bold; }
-          .divider { border-bottom: 0.5pt solid black; margin-top: 1pt; margin-bottom: 2pt; }
-          .summary-text { font-size: 10pt; text-align: left; }
-          .section-title { font-size: 12pt; font-variant: small-caps; font-weight: bold; letter-spacing: 0.5px; border-bottom: 0.5pt solid black; padding-bottom: 1pt; margin-top: 8pt; margin-bottom: 4pt; }
-          .item-list { padding-left: 0; list-style: none; }
-          .item-container { margin-bottom: 7pt; }
-          .subheading-grid { display: flex; justify-content: space-between; margin-bottom: -2pt; }
-          .subheading-grid .company { font-weight: bold; font-size: 10.5pt; }
-          .subheading-grid .date { font-size: 10.5pt; }
-          .role { font-style: italic; font-weight: bold; font-size: 11pt; color: #1f2937; margin-bottom: 2pt; margin-left: 12pt; }
-          ul.details-list { list-style: none; padding-left: 12pt; margin: 0; }
-          ul.details-list li { font-size: 10pt; margin-bottom: 1pt; position: relative; padding-left: 10pt; }
-          ul.details-list li::before { content: '◦'; position: absolute; left: 0; top: 1px; }
-          .project-item { font-size: 10pt; margin-bottom: 2pt; }
-          ul.skills-list { list-style-type: none; padding-left: 0; }
-          ul.skills-list li { font-size: 10pt; margin-bottom: 1pt; }
+          .header { text-align: left; padding-bottom: 0.2rem;  }
+          .name { font-size: 1.5rem; font-weight: bold; color: #1a202c; margin-bottom: 0.2rem; line-height: 1.2; padding-top:15px; }
+          .contact-info { display: flex; font-size: 0.875rem; color: #4a5568; }
+          .contact-item { margin-right: 2rem; }
+          .section { margin-bottom: 1.5rem; }
+          .section-title { font-size: 0.9rem; font-weight: bold; color: #1a202c; border-bottom: 1px solid #1a202c; padding-bottom: 0.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+          .summary-text { color: #2d3748; line-height: 1.6; font-size: 1rem; font-style: italic; }
+          .experience-item { margin-bottom: 1.5rem; }
+          .experience-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.2rem; }
+          .company-name { font-weight: bold; font-size: 1rem; color: #1a202c; }
+          .date { font-size: 0.875rem; font-weight: 600; color: #4a5568; }
+          .role { font-weight: 600; font-size: 0.875rem; color: #2d3748; margin-bottom: 0.5rem; }
+          .details-list { list-style: none; padding-left: 0; margin-top: 0; }
+          .details-list li { display: flex; align-items: flex-start; color: #2d3748; line-height: 1.6; font-size: 0.95rem; margin-bottom: 0.25rem; }
+          .bullet { color: #1a202c; margin-right: 0.5rem; flex-shrink: 0; }
+          .project-item { margin-bottom: 0.25rem; }
+          .project-name { font-weight: bold; font-size: 1rem; color: #1a202c; margin-bottom: 0.5rem; }
+          .project-desc { color: #2d3748; line-height: 1.6; font-size: 0.95rem; }
+          .skills-category { margin-bottom: 0.2rem; font-size: 0.95rem;}
+          .skills-title { font-weight: bold; color: #1a202c; }
+          .skills-list { color: #2d3748; }
         </style>
       </head>
       <body>
-        <div class="page">
-          <div class="header"> <div class="name">${name}</div> </div>
-          <div class="summary-header"> <span class="title">Summary</span> <span class="rate">Freelance Rate: $150 / hour</span> </div>
-          <div class="divider"></div>
-          <p class="summary-text">${processText(dynamicSummary)}</p>
-          <div class="section-title">Experience</div>
-          <ul class="item-list">
-            ${dynamicExperience.map(exp => `<li class="item-container"><div class="subheading-grid"> <span class="company">${exp.company}</span> <span class="date">${exp.period}</span> </div><div class="role">${exp.role}</div><ul class="details-list"> ${exp.points.map(point => `<li>${processText(point)}</li>`).join('')} </ul></li>`).join('')}
-          </ul>
-          <div class="section-title">Projects</div>
-          <ul class="item-list">
-            ${dynamicProjects.map(proj => `<li class="project-item"><strong>${proj.name}</strong><br/>${processText(proj.description)}</li>`).join('')}
-          </ul>
-          <div class="section-title">Skills</div>
-          <ul class="skills-list">
-            ${languages ? `<li><strong>Languages:</strong> ${languages}</li>` : ''}
-            ${frameworks ? `<li><strong>Frameworks & Libraries:</strong> ${frameworks}</li>` : ''}
-            ${databases ? `<li><strong>Databases:</strong> ${databases}</li>` : ''}
-            ${blockchain ? `<li><strong>Blockchain & WebAssembly:</strong> ${blockchain}</li>` : ''}
-            ${tools ? `<li><strong>Tools & DevOps:</strong> ${tools}</li>` : ''}
-            ${otherSkills ? `<li><strong>Core Technologies:</strong> ${otherSkills}</li>` : ''}
-          </ul>
+        <div class="page-container">
+          <div class="header">
+            <h2 class="name">${name}</h2>
+            <div class="contact-info">
+              ${phone ? `<div class="contact-item">Phone: ${phone}</div>` : ''}
+              ${telegram ? `<div class="contact-item">Telegram: ${telegram}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Summary</h2>
+            <div class="summary-text">${processText(dynamicSummary)}</div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Experience</h2>
+            ${dynamicExperience.map(exp => `
+              <div class="experience-item">
+                <div class="experience-header">
+                  <h3 class="company-name">${exp.company}</h3>
+                  <p class="date">${exp.period}</p>
+                </div>
+                <p class="role">${exp.role}</p>
+                <ul class="details-list">
+                  ${exp.points.map(point => `
+                    <li>
+                      <span class="bullet">•</span>
+                      <span>${processText(point)}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Projects</h2>
+            ${dynamicProjects.map(proj => `
+              <div class="project-item">
+                <div class="project-name">${proj.name}</div>
+                <div class="project-desc">${processText(proj.description)}</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Skills</h2>
+            ${languages ? `<div class="skills-category"><span class="skills-title">Languages:</span> <span class="skills-list">${languages}</span></div>` : ''}
+            ${frameworks ? `<div class="skills-category"><span class="skills-title">Frameworks & Libraries:</span> <span class="skills-list">${frameworks}</span></div>` : ''}
+            ${blockchain ? `<div class="skills-category"><span class="skills-title">Blockchain:</span> <span class="skills-list">${blockchain}</span></div>` : ''}
+            ${tools ? `<div class="skills-category"><span class="skills-title">Tools & DevOps:</span> <span class="skills-list">${tools}</span></div>` : ''}
+          </div>
         </div>
       </body>
       </html>
@@ -232,98 +273,60 @@ export const useBulkResumeGenerator = () => {
       container.style.top = '0';
       document.body.appendChild(container);
 
-      const contentToCapture = container.querySelector('.page');
+      const contentToCapture = container.querySelector('.page-container');
 
-      // Compute a scale so the rendered canvas will fit inside a single PDF page.
-      // We'll compare the element size (in CSS px) with the target PDF size (in inches -> px at 96dpi)
-      // Try to infer CSS pixels per inch from the rendered element if possible,
-      // otherwise fallback to common assumption 96.
-      let pxPerInch = 96; // CSS pixels per inch (common browser assumption)
-      try {
-        // contentToCapture may already be in the DOM; compute px/in from its width and the PDF width in inches
-        const measuredPxPerInch = contentToCapture.offsetWidth / pdfWidthIn;
-        if (measuredPxPerInch && isFinite(measuredPxPerInch)) pxPerInch = measuredPxPerInch;
-      } catch (e) {
-        // fallback to default pxPerInch
-      }
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter', compress: true, precision: 2, floatPrecision: 2 });
+      // create the PDF and measure page size in inches
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter', compress: true, precision: 16 });
       const pdfWidthIn = pdf.internal.pageSize.getWidth();
       const pdfHeightIn = pdf.internal.pageSize.getHeight();
 
-      const targetPxWidth = pdfWidthIn * pxPerInch;
-      const targetPxHeight = pdfHeightIn * pxPerInch;
+      // measure the element's CSS pixel size (this corresponds to the 'in' width we set earlier)
+      const elementRect = contentToCapture.getBoundingClientRect();
+      const elementCssPxWidth = elementRect.width; // pixels for 8.5in
+      const elementCssPxHeight = elementRect.height;
 
-      // Element dimensions (CSS pixels)
-      const contentWidth = contentToCapture.offsetWidth || Math.round(targetPxWidth);
-      const contentHeight = contentToCapture.scrollHeight || Math.round(targetPxHeight);
-
-      // html2canvas default scale is window.devicePixelRatio. We'll pick a base max scale for quality.
-      const defaultMaxScale = 2; // keep quality reasonable
-      const devicePR = window.devicePixelRatio || 1;
-
-      // Determine the maximum scale that keeps the rendered canvas within target PDF pixel size
-      const maxScaleForWidth = targetPxWidth / contentWidth;
-      const maxScaleForHeight = targetPxHeight / contentHeight;
-      // Use the smallest of defaultMaxScale and the calculated limits. This allows downscaling when content is large.
-      let usedScale = Math.min(defaultMaxScale, maxScaleForWidth, maxScaleForHeight);
-      // Don't allow extremely small scales which make text unreadable; clamp to a minimum
-      usedScale = Math.max(usedScale, 0.45);
-
+      // render at devicePixelRatio for good quality, html2canvas will produce a canvas with
+      // canvas.width = elementCssPxWidth * scale
+      const renderScale = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
       const canvas = await html2canvas(contentToCapture, {
-        scale: usedScale * devicePR,
+        scale: renderScale,
         useCORS: true,
-        width: contentWidth,
-        height: contentHeight,
-        allowTaint: false,
         backgroundColor: '#ffffff',
-        removeContainer: true,
-        // html2canvas's `quality` only applies to toDataURL/jpeg conversion, we'll control that later
       });
 
+      // remove the hidden container as soon as we have the canvas
       document.body.removeChild(container);
 
-      // Convert to PNG with reduced quality for smaller file size
-      const imgData = canvas.toDataURL('image/jpeg', 0.78); // Slightly higher quality but still compressed
-      console.log('Image data created, size:', Math.round(imgData.length / 1024), 'KB');
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-      // Place the generated canvas into the existing PDF instance ensuring it fits the page.
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      // compute a measured pixels-per-inch value using the element CSS width (8.5in)
+      // this helps map canvas pixels to physical inches in the PDF
+      const measuredPxPerInch = elementCssPxWidth / 8.5; // pixels per inch
 
-      // Convert canvas pixel dimensions to inches for jsPDF placement
-      const canvasPxWidth = canvas.width; // actual canvas width in px
-      const canvasPxHeight = canvas.height; // actual canvas height in px
-  // Convert canvas pixel dimensions to inches for jsPDF placement.
-  // Account for devicePixelRatio because canvas.width includes device pixels.
-  const canvasInWidth = canvasPxWidth / (pxPerInch * devicePR);
-  const canvasInHeight = canvasPxHeight / (pxPerInch * devicePR);
+      // canvas dimensions (in pixels)
+      const canvasPxWidth = canvas.width;
+      const canvasPxHeight = canvas.height;
 
-      const imgAspectRatio = canvasInWidth / canvasInHeight;
-      const pageAspectRatio = pdfWidth / pdfHeight;
+      // convert canvas pixel dimensions to inches using the measured px-per-inch
+      const canvasInWidth = canvasPxWidth / measuredPxPerInch;
+      const canvasInHeight = canvasPxHeight / measuredPxPerInch;
 
-      let finalWidthIn, finalHeightIn;
-      if (imgAspectRatio > pageAspectRatio) {
-        finalWidthIn = pdfWidth;
-        finalHeightIn = pdfWidth / imgAspectRatio;
-      } else {
-        finalHeightIn = pdfHeight;
-        finalWidthIn = pdfHeight * imgAspectRatio;
-      }
+      // compute scale required to fit into a single PDF page (both width and height)
+      const widthScale = pdfWidthIn / canvasInWidth;
+      const heightScale = pdfHeightIn / canvasInHeight;
+      const fitScale = Math.min(widthScale, heightScale, 1); // never upscale
 
-      // Apply a small safety factor to ensure the image never slightly overflows the page due to rounding
-      const safetyFactor = 0.96; // shrink to 96% of computed size
-      finalWidthIn = finalWidthIn * safetyFactor;
-      finalHeightIn = finalHeightIn * safetyFactor;
+      const finalWidthIn = canvasInWidth * fitScale;
+      const finalHeightIn = canvasInHeight * fitScale;
 
-      const xOffsetIn = (pdfWidth - finalWidthIn) / 2;
-      const yOffsetIn = (pdfHeight - finalHeightIn) / 2;
+      // center horizontally and vertically (small top margin preserved)
+      const marginTopIn = 0.0; // adjust if you want top margin
+      const x = (pdfWidthIn - finalWidthIn) / 2;
+      const y = marginTopIn + Math.max(0, (pdfHeightIn - finalHeightIn) / 2 - marginTopIn);
 
-      console.log('Adding image to PDF...', { canvasPxWidth, canvasPxHeight, finalWidthIn, finalHeightIn, pxPerInch, devicePR });
-      pdf.addImage(imgData, 'JPEG', xOffsetIn, yOffsetIn, finalWidthIn, finalHeightIn, '', 'FAST');
+      pdf.addImage(imgData, 'JPEG', x, y, finalWidthIn, finalHeightIn, '', 'FAST');
 
-      // Clean up and save
       pdf.save(filename);
-      console.log('PDF saved successfully!');
 
       return true;
     } catch (error) {
@@ -346,36 +349,22 @@ export const useBulkResumeGenerator = () => {
       const employeesResponse = await axios.get('/api/employees');
       const allEmployees = employeesResponse.data;
 
-      console.log(`Fetched ${allEmployees.length} employees`);
-
-      // Step 2: Filter employees - include all employees who have any resume data
+      // Step 2: Filter employees
       const filteredEmployees = allEmployees.filter(emp => {
         if (!emp.resumeData) return false;
-
-        // First try to find employees with the specific template type
         const resumeDataForType = emp.resumeData[type];
         if (resumeDataForType) {
-          const hasValidData = resumeDataForType.experience ||
-                 resumeDataForType.projects ||
-                 resumeDataForType.skills ||
-                 resumeDataForType.summary;
-          if (hasValidData) return true;
+          return resumeDataForType.experience || resumeDataForType.projects || resumeDataForType.skills || resumeDataForType.summary;
         }
-
-        // If no specific template data, check if they have any resume data at all
         const hasAnyResumeData = emp.resumeData.freelance || emp.resumeData.techstack;
         if (hasAnyResumeData) {
-          console.log(`Employee ${emp.name} has resume data but not for ${type} template`);
-          return true; // Include them, the API will handle template conversion
+          return true;
         }
-
         return false;
       });
 
-      console.log(`Found ${filteredEmployees.length} employees with ${type} data`);
-
       if (filteredEmployees.length === 0) {
-        throw new Error(`No employees found with ${type} resume data. Please make sure employees have uploaded ${type} resume files.`);
+        throw new Error(`No employees found with resume data for the "${type}" template.`);
       }
 
       setProgress({
@@ -385,7 +374,7 @@ export const useBulkResumeGenerator = () => {
         status: 'generating'
       });
 
-      // Step 3: Generate tailored resumes one by one using backend API
+      // Step 3: Generate tailored resumes one by one
       for (let i = 0; i < filteredEmployees.length; i++) {
         if (isCancelled) break;
 
@@ -400,8 +389,6 @@ export const useBulkResumeGenerator = () => {
         });
 
         try {
-          // Call backend API to get tailored resume content based on job description
-          console.log(`Generating tailored resume for ${employee.name} with job description...`);
           const tailoredResponse = await axios.post('/api/generate-resume', {
             employeeId: employee._id,
             jobDescription: jobDescription,
@@ -409,9 +396,7 @@ export const useBulkResumeGenerator = () => {
           });
 
           const tailoredResumeData = tailoredResponse.data;
-          console.log(`Received tailored resume data for ${employee.name}`);
 
-          // Combine with employee info for template generation
           const combinedData = {
             name: employee.name,
             phone: employee.phone,
@@ -422,21 +407,17 @@ export const useBulkResumeGenerator = () => {
             skills: tailoredResumeData.skills
           };
 
-          // Generate HTML using the tailored data
           const resumeHTML = generateHighQualityResumeHTML(combinedData, jobDescription);
           const filename = `${employeeName}_${type}_resume.pdf`;
 
-          // Generate and download PDF
           await generateAndDownloadPDF(resumeHTML, filename);
 
-          // Small delay between downloads to prevent browser issues
           if (i < filteredEmployees.length - 1) {
             await new Promise(resolve => setTimeout(resolve, 300));
           }
 
         } catch (error) {
           console.error(`Failed to generate resume for ${employee.name}:`, error);
-          // Continue with next employee even if one fails
           continue;
         }
       }
@@ -456,7 +437,6 @@ export const useBulkResumeGenerator = () => {
       setIsGenerating(false);
       setIsCancelled(false);
 
-      // Reset status after a delay
       setTimeout(() => {
         setProgress(prev => ({ ...prev, status: 'idle' }));
       }, 2000);
@@ -475,7 +455,3 @@ export const useBulkResumeGenerator = () => {
     isCancelled
   };
 };
-
-
-
-
