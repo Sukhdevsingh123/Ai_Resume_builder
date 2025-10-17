@@ -90,8 +90,8 @@ The **AI Resume Builder** is a modern web application designed to streamline the
 
 ## 🔌 Quick features:(Bulk resumes are generated only Single click)
 
-- Bulk-generate tailored single-page PDF resumes for multiple employees of freelencer or techsteck one by one .
--select one option in both all resumes of freelencer or all resumes of techsteck 
+- Bulk-generate tailored single-page PDF resumes for multiple employees of freelencer or techsteck one by one 
+- select one option in both all resumes of freelencer or all resumes of techsteck 
 - Auto-scale HTML content to fit a single PDF page (safety scaling to avoid overflow).
 - Progress tracking and cancellation support during generation.
 
