@@ -356,13 +356,13 @@ const ResumePreview = ({ resumeData }) => {
 
           .header {
             text-align: center;
-            margin-bottom: 20px;
+            // margin-bottom: 8px;
           }
 
           .name {
             font-size: 1.8rem;
             font-weight: 700;
-            margin-bottom: 15px;
+            // margin-bottom: 8px;
           }
 
           .summary-section {
@@ -474,7 +474,7 @@ const ResumePreview = ({ resumeData }) => {
           .skill-item {
             font-size: 0.9rem;
             line-height: 1.3;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
           }
 
           .skill-category {
@@ -932,8 +932,8 @@ const ResumePreview = ({ resumeData }) => {
         }}
       >
         {/* Header */}
-        <div className="text-left pb-4 mb-6">
-          <h1 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 leading-tight" style={{ fontFamily: styling?.fonts?.heading }}>{name}</h1>
+        <div className="text-left pb-4 ">
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900  leading-tight" style={{ fontFamily: styling?.fonts?.heading }}>{name}</h1>
           <div className="flex flex-col sm:flex-row items-start space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-8 text-gray-600">
             <div className="text-xs sm:text-sm font-medium">{phone}</div>
             <div className="text-xs sm:text-sm font-medium">{telegram}</div>
@@ -997,7 +997,7 @@ const ResumePreview = ({ resumeData }) => {
           {/* Skills */}
           <div className="resume-section">
             <SectionTitle title="SKILLS" />
-            <div className="space-y-3">
+            <div className="">
               {/* Languages */}
               <div>
                 <span className="font-bold text-gray-900 text-sm" style={{ fontFamily: styling?.fonts?.primary || 'Georgia, serif' }}>Languages:</span>

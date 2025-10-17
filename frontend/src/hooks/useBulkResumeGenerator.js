@@ -173,7 +173,7 @@ export const useBulkResumeGenerator = () => {
         <title>${name} - Resume</title>
         <style>
           /* reduce base font size so content more easily fits a single PDF page while remaining readable */
-          html { font-size: 14px; }
+          html { font-size: 15px; }
           body { background-color: #ffffff; margin: 0; font-family: Georgia, serif; color: #2c3e50; }
           .page-container { width: 8.5in; min-height: 14in;  box-sizing: border-box; margin: 0 auto; }
           strong { font-weight: bold; }
