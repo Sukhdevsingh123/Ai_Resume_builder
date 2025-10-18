@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
@@ -140,7 +139,7 @@ export const useBulkResumeGenerator = () => {
     return Array.from(merged);
   };
 
-  // --- NEW HTML TEMPLATE FUNCTION ---
+  // --- HTML TEMPLATE FUNCTION ---
   const generateHighQualityResumeHTML = (employeeData, jobDescription) => {
     const { name, phone, telegram, summary, experience, projects, skills } = employeeData;
     const dynamicSummary = generateDynamicSummary(summary, jobDescription);
@@ -155,8 +154,8 @@ export const useBulkResumeGenerator = () => {
         return categorySkills;
     };
 
-    const languagesArr = getSkillsArrayForCategory(['rust', 'solidity', 'python', 'javascript', 'js', 'go', 'html', 'css', 'typescript', 'ts', 'c++', 'sql']);
-    const frameworksArr = getSkillsArrayForCategory(['tokio', 'async-std', 'react', 'node', 'node.js', 'express', 'next', 'next.js', 'django', 'flask', 'fastapi', 'mern', 'mongodb', 'mongoose']);
+    const languagesArr = getSkillsArrayForCategory(['rust', 'solidity', 'python', 'javascript', 'js', 'go', 'html', 'css', 'typescript', 'ts', 'c++', 'sql', 'node.js']);
+    const frameworksArr = getSkillsArrayForCategory(['tokio', 'async-std', 'react', 'express', 'next', 'next.js', 'django', 'flask', 'fastapi', 'mern', 'mongodb', 'mongoose']);
     const toolsArr = getSkillsArrayForCategory(['git', 'github', 'githubactions', 'docker', 'kubernetes', 'aws', 'gcp', 'azure', 'ci/cd', 'cicd', 'jenkins', 'terraform']);
     const blockchainArr = getSkillsArrayForCategory(['ethereum', 'polygon', 'solana', 'evm', 'web3', 'web3.js', 'ethers', 'ethers.js', 'ipfs', 'filecoin', 'decentralized', 'zk', 'zk-snarks', 'zksnarks', 'smartcontracts', 'smart.contract', 'jamprotocol', 'cross-chain', 'hyperlane', 'chainlink', 'bsc', 'wormhole', 'blockchain', 'hardhat', 'foundry']);
     
@@ -172,30 +171,36 @@ export const useBulkResumeGenerator = () => {
         <meta charset="UTF-8">
         <title>${name} - Resume</title>
         <style>
-          /* reduce base font size so content more easily fits a single PDF page while remaining readable */
-          html { font-size: 15px; }
+          /* --- KEY CHANGES FOR A4 FIT --- */
+          html { font-size: 14px; } /* Reduced base font size */
           body { background-color: #ffffff; margin: 0; font-family: Georgia, serif; color: #2c3e50; }
-          .page-container { width: 8.5in; min-height: 14in;  box-sizing: border-box; margin: 0 auto; }
+          .page-container { 
+            width: 210mm; /* A4 Width */
+            min-height: 297mm; /* A4 Height */
+            padding: 0.4in; /* Reduced padding */
+            box-sizing: border-box; 
+            margin: 0 auto; 
+          }
           strong { font-weight: bold; }
-          .header { text-align: left; padding-bottom: 0.2rem;  }
-          .name { font-size: 1.5rem; font-weight: bold; color: #1a202c; margin-bottom: 0.2rem; line-height: 1.2; padding-top:15px; }
-          .contact-info { display: flex; font-size: 0.875rem; color: #4a5568; }
+          .header { text-align: left; padding-bottom: 0.2rem; }
+          .name { font-size: 1.4rem; font-weight: bold; color: #1a202c; margin-bottom: 0.2rem; line-height: 1.2; padding-top: 10px; }
+          .contact-info { display: flex; font-size: 0.85rem; color: #4a5568; }
           .contact-item { margin-right: 2rem; }
-          .section { margin-bottom: 1.5rem; }
-          .section-title { font-size: 0.9rem; font-weight: bold; color: #1a202c; border-bottom: 1px solid #1a202c; padding-bottom: 0.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
-          .summary-text { color: #2d3748; line-height: 1.6; font-size: 1rem; font-style: italic; }
-          .experience-item { margin-bottom: 1.5rem; }
+          .section { margin-bottom: 0.8rem; } /* Reduced section spacing */
+          .section-title { font-size: 0.85rem; font-weight: bold; color: #1a202c; border-bottom: 1px solid #1a202c; padding-bottom: 0.4rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+          .summary-text { color: #2d3748; line-height: 1.5; font-size: 0.95rem; font-style: italic; } /* Tighter line height */
+          .experience-item { margin-bottom: 0.8rem; } /* Reduced item spacing */
           .experience-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.2rem; }
-          .company-name { font-weight: bold; font-size: 1rem; color: #1a202c; }
-          .date { font-size: 0.875rem; font-weight: 600; color: #4a5568; }
-          .role { font-weight: 600; font-size: 0.875rem; color: #2d3748; margin-bottom: 0.5rem; }
+          .company-name { font-weight: bold; font-size: 0.95rem; color: #1a202c; }
+          .date { font-size: 0.8rem; font-weight: 600; color: #4a5568; }
+          .role { font-weight: 600; font-size: 0.85rem; color: #2d3748; margin-bottom: 0.4rem; }
           .details-list { list-style: none; padding-left: 0; margin-top: 0; }
-          .details-list li { display: flex; align-items: flex-start; color: #2d3748; line-height: 1.6; font-size: 0.95rem; margin-bottom: 0.25rem; }
+          .details-list li { display: flex; align-items: flex-start; color: #2d3748; line-height: 1.5; font-size: 0.9rem; margin-bottom: 0.2rem; } /* Tighter line height and spacing */
           .bullet { color: #1a202c; margin-right: 0.5rem; flex-shrink: 0; }
-          .project-item { margin-bottom: 0.25rem; }
-          .project-name { font-weight: bold; font-size: 1rem; color: #1a202c; margin-bottom: 0.5rem; }
-          .project-desc { color: #2d3748; line-height: 1.6; font-size: 0.95rem; }
-          .skills-category { margin-bottom: 0.2rem; font-size: 0.95rem;}
+          .project-item { margin-bottom: 0.6rem; } /* Reduced item spacing */
+          .project-name { font-weight: bold; font-size: 0.95rem; color: #1a202c; margin-bottom: 0.2rem; }
+          .project-desc { color: #2d3748; line-height: 1.5; font-size: 0.9rem; } /* Tighter line height */
+          .skills-category { margin-bottom: 0.4rem; font-size: 0.9rem;}
           .skills-title { font-weight: bold; color: #1a202c; }
           .skills-list { color: #2d3748; }
         </style>
@@ -203,18 +208,16 @@ export const useBulkResumeGenerator = () => {
       <body>
         <div class="page-container">
           <div class="header">
-            <h2 class="name">${name}</h2>
+            <h1 class="name">${name}</h1>
             <div class="contact-info">
               ${phone ? `<div class="contact-item">Phone: ${phone}</div>` : ''}
               ${telegram ? `<div class="contact-item">Telegram: ${telegram}</div>` : ''}
             </div>
           </div>
-
           <div class="section">
             <h2 class="section-title">Summary</h2>
             <div class="summary-text">${processText(dynamicSummary)}</div>
           </div>
-
           <div class="section">
             <h2 class="section-title">Experience</h2>
             ${dynamicExperience.map(exp => `
@@ -235,7 +238,6 @@ export const useBulkResumeGenerator = () => {
               </div>
             `).join('')}
           </div>
-
           <div class="section">
             <h2 class="section-title">Projects</h2>
             ${dynamicProjects.map(proj => `
@@ -245,7 +247,6 @@ export const useBulkResumeGenerator = () => {
               </div>
             `).join('')}
           </div>
-
           <div class="section">
             <h2 class="section-title">Skills</h2>
             ${languages ? `<div class="skills-category"><span class="skills-title">Languages:</span> <span class="skills-list">${languages}</span></div>` : ''}
@@ -259,15 +260,15 @@ export const useBulkResumeGenerator = () => {
     `;
   };
 
-  // --- PDF GENERATION & MAIN LOGIC (OPTIMIZED) ---
+  // --- PDF GENERATION & MAIN LOGIC (UPDATED FOR SINGLE PAGE A4 FIT) ---
   const generateAndDownloadPDF = async (htmlContent, filename) => {
     try {
       if (!htmlContent || htmlContent.trim() === '') throw new Error('HTML content is empty or invalid');
       const container = document.createElement('div');
       container.innerHTML = htmlContent;
-      container.style.width = '8.5in';
-      // let content determine its height so we can capture full content and then scale down
-      container.style.height = 'auto';
+      // Use A4 dimensions for rendering container
+      container.style.width = '210mm';
+      container.style.height = 'auto'; // Let content determine height initially
       container.style.position = 'absolute';
       container.style.left = '-9999px';
       container.style.top = '0';
@@ -275,64 +276,54 @@ export const useBulkResumeGenerator = () => {
 
       const contentToCapture = container.querySelector('.page-container');
 
-      // create the PDF and measure page size in inches
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter', compress: true, precision: 16 });
-      const pdfWidthIn = pdf.internal.pageSize.getWidth();
-      const pdfHeightIn = pdf.internal.pageSize.getHeight();
-
-      // measure the element's CSS pixel size (this corresponds to the 'in' width we set earlier)
-      const elementRect = contentToCapture.getBoundingClientRect();
-      const elementCssPxWidth = elementRect.width; // pixels for 8.5in
-      const elementCssPxHeight = elementRect.height;
-
-      // render at devicePixelRatio for good quality, html2canvas will produce a canvas with
-      // canvas.width = elementCssPxWidth * scale
-      const renderScale = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
       const canvas = await html2canvas(contentToCapture, {
-        scale: renderScale,
+        scale: 2, // High resolution rendering
         useCORS: true,
         backgroundColor: '#ffffff',
       });
 
-      // remove the hidden container as soon as we have the canvas
       document.body.removeChild(container);
 
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      
+      // --- KEY CHANGE HERE ---
+      // Set PDF format to 'a4'
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'a4', compress: true });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      
+      const canvasAspectRatio = canvasWidth / canvasHeight;
+      const pageAspectRatio = pdfWidth / pdfHeight;
 
-      // compute a measured pixels-per-inch value using the element CSS width (8.5in)
-      // this helps map canvas pixels to physical inches in the PDF
-      const measuredPxPerInch = elementCssPxWidth / 8.5; // pixels per inch
+      let finalWidth, finalHeight;
 
-      // canvas dimensions (in pixels)
-      const canvasPxWidth = canvas.width;
-      const canvasPxHeight = canvas.height;
+      // Logic to scale the image to fit the page while maintaining aspect ratio
+      if (canvasAspectRatio > pageAspectRatio) {
+          finalWidth = pdfWidth;
+          finalHeight = pdfWidth / canvasAspectRatio;
+      } else {
+          finalHeight = pdfHeight;
+          finalWidth = pdfHeight * canvasAspectRatio;
+      }
 
-      // convert canvas pixel dimensions to inches using the measured px-per-inch
-      const canvasInWidth = canvasPxWidth / measuredPxPerInch;
-      const canvasInHeight = canvasPxHeight / measuredPxPerInch;
+      // Center the scaled image on the PDF page
+      const x = (pdfWidth - finalWidth) / 2;
+      const y = (pdfHeight - finalHeight) / 2;
 
-      // compute scale required to fit into a single PDF page (both width and height)
-      const widthScale = pdfWidthIn / canvasInWidth;
-      const heightScale = pdfHeightIn / canvasInHeight;
-      const fitScale = Math.min(widthScale, heightScale, 1); // never upscale
-
-      const finalWidthIn = canvasInWidth * fitScale;
-      const finalHeightIn = canvasInHeight * fitScale;
-
-      // center horizontally and vertically (small top margin preserved)
-      const marginTopIn = 0.0; // adjust if you want top margin
-      const x = (pdfWidthIn - finalWidthIn) / 2;
-      const y = marginTopIn + Math.max(0, (pdfHeightIn - finalHeightIn) / 2 - marginTopIn);
-
-      pdf.addImage(imgData, 'JPEG', x, y, finalWidthIn, finalHeightIn, '', 'FAST');
-
+      // Add the image, ensuring it's on a single page
+      pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
+      
       pdf.save(filename);
-
       return true;
     } catch (error) {
       console.error('PDF generation failed:', error);
-      if (document.body.contains(container)) {
-        document.body.removeChild(container);
+      const container = document.querySelector('.page-container');
+      if (container && document.body.contains(container)) {
+          document.body.removeChild(container);
       }
       throw error;
     }
